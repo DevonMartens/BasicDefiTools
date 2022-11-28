@@ -5,10 +5,6 @@ pragma solidity ^0.8.16;
 // import "hardhat/console.sol";
 
 contract EtherStorageWallet {
-    uint public unlockTime;
-    address payable public owner;
-
-    event Withdrawal(uint amount, uint when);
 
     address public payable owner;
 
