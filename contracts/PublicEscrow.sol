@@ -12,8 +12,10 @@ Releasing the escrow funds will send Ether to the multiple sellers if any in equ
 
 pragma solidity ^0.8.16;
 
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract PublicEscrow {
+
+contract PublicEscrow is ReentrancyGuard {
 
     /**  
     ================================================
@@ -68,11 +70,11 @@ contract PublicEscrow {
     ================================================
     **/
 
-    function setEscrowPartyAddress(address newEscrowAddress) external onlyEscrowParty(){
+    function setEscrowPartyAddress(address newEscrowAddress) external onlyEscrowParty() {
         escrowParty = newEscrowAddress;
     }
 
-   function resetItemId() external onlyEscrowParty(){
+   function resetItemId() external onlyEscrowParty() {
    //require all items sold
    for (uint i = 0; i < ItemId; i++) {
             if (isSold[i] == false) {
@@ -121,7 +123,7 @@ contract PublicEscrow {
     @Notice: User has to have an active sale.
     */  
 
-    function listItem(uint256 listPrice, uint256 numSellers) external {
+    function listItem(uint256 listPrice, uint256 numSellers) external nonReentrant {
         //public mapping address to itemID
         sellerToItemId[msg.sender] = ItemId;
         //item id to address
@@ -144,7 +146,7 @@ contract PublicEscrow {
     @Notice: User has to have an active sale.
     */     
 
-    function addSeller(uint256 ItemIdInQuestion, address addressToAdd) external {
+    function addSeller(uint256 ItemIdInQuestion, address addressToAdd) external nonReentrant {
         require(sellerToItemId[msg.sender] == ItemIdInQuestion, "ITEM_LISTED_NOT_LISTED_BY_YOU");
         require(sellerToItemId[msg.sender] =! 0, "BAD_REQUEST");
         if(NumberOfSellers[ItemIdInQuestion] == 2 &&  SecondSellerAdded[ItemIdInQuestion] == false){
@@ -172,7 +174,7 @@ contract PublicEscrow {
     @Params: The arugment `uint256 ItemID` is the itemId assoicated with the sale.
     */  
     
-    function depositForSelf(uint256 ItemID) external payable {
+    function depositForSelf(uint256 ItemID) external payable nonReentrant {
          //checks if itemid was already isSold
          if(isSold[ItemID] == true){
              revert("ITEM_IS_ALREADY_SOLD");
@@ -203,7 +205,7 @@ contract PublicEscrow {
     @Params: The arugment `address PayingOnBehalfOf` user you buy for.
     */  
 
-    function depositForSelf(uint256 ItemID, address PayingOnBehalfOf) external payable {
+    function depositForSelf(uint256 ItemID, address PayingOnBehalfOf) external payable nonReentrant {
         require(buyerItemIdOfIntrest[ItemID] == PayingOnBehalfOf, "NO_SWIPING");
         require(isPendingSale[ItemID] == true "ITEM_SOLD");
         buyerPaid[PayingOnBehalfOf] += msg.value;
