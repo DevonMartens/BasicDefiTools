@@ -46,8 +46,5 @@ contract BasicEscrow {
     }
 
     }
-
-
-
   
 }
