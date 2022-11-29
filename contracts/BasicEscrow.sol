@@ -31,8 +31,12 @@ contract BasicEscrow {
             revert("CONTRACT_BALANCE_MORE_THAN_ESTATE")
         }
     
-    modifer onlyEscrowParty{
-        require(msg.sender == escrowParty, "YOU_ARE_NOT_ESCROWP");
+      modifier onlyEscrowParty() {
+        require(
+            msg.sender == escrowParty, 
+            "YOU_ARE_NOT_ESCROW"
+            );
+            _;
     }
     
     function release() external onlyEscrowParty(){
