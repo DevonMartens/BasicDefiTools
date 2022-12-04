@@ -21,7 +21,7 @@ contract EtherStorageWallet {
            reciever.transfer(amount);
            return;
        }else {
-           revert("ONLY_OWNER_ALLOWED")
+           revert("ONLY_OWNER_ALLOWED");
        }
     }
 
