@@ -6,7 +6,7 @@ pragma solidity ^0.8.16;
 
 contract EtherStorageWallet {
 
-    address public payable owner;
+    address payable owner;
 
     constructor(address _owner) {
         owner = _owner;
