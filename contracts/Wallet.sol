@@ -23,7 +23,6 @@ contract EtherStorageWallet {
        }else {
            revert("ONLY_OWNER_ALLOWED")
        }
-       reciever.transfer(amount);
     }
 
     function balanceOf() public view returns(uint256){
