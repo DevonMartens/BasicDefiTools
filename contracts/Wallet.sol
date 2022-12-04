@@ -9,21 +9,21 @@ contract EtherStorageWallet {
     address public payable owner;
 
     constructor(address _owner) {
-        owner = _owner
+        owner = _owner;
     }
 
     function deposit() external payable {
 
     }
 
-    function withdraw(address payable reciever, uint256 amount) external {
-
+   function withdraw(address payable reciever, uint256 amount) external {
        if(msg.sender == owner){
            reciever.transfer(amount);
            return;
        }else {
            revert("ONLY_OWNER_ALLOWED")
        }
+       reciever.transfer(amount);
     }
 
     function balanceOf() public view returns(uint256){
