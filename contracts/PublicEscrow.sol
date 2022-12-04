@@ -75,14 +75,20 @@ contract PublicEscrow is ReentrancyGuard {
     }
 
    function resetItemId() external onlyEscrowParty() {
-   //require all items sold
-   for (uint i = 0; i < ItemId; i++) {
-            if (isSold[i] == false) {
-                revert("ITEMS_STILL_PENDING_SALE");
-            }
-        }
+    require(checkSalesEnded() == false, "SALES_PENDING");
        ItemId = 0;
    }
+
+   function checkSalesEnded() public view returns (bool) {
+        for (uint i = 0; i < ItemId; i++) {
+            if (isSold[i] == false) {
+                return true;
+            } 
+            return false;
+        } 
+   }
+
+
 
    
     /**  
@@ -148,7 +154,6 @@ contract PublicEscrow is ReentrancyGuard {
 
     function addSeller(uint256 ItemIdInQuestion, address addressToAdd) external nonReentrant {
         require(sellerToItemId[msg.sender] == ItemIdInQuestion, "ITEM_LISTED_NOT_LISTED_BY_YOU");
-        require(sellerToItemId[msg.sender] =! 0, "BAD_REQUEST");
         if(NumberOfSellers[ItemIdInQuestion] == 2 &&  SecondSellerAdded[ItemIdInQuestion] == false){
             SecondSeller[ItemIdInQuestion] = addressToAdd;
             SecondSellerAdded[ItemIdInQuestion] = true;
@@ -186,10 +191,11 @@ contract PublicEscrow is ReentrancyGuard {
          if(isPendingSale[ItemID] == false) {
              isPendingSale[ItemID] = true;
              buyerItemIdOfIntrest[ItemID] = msg.sender;
+              //adds amount to what buyer has paid.
+             buyerPaid[msg.sender] += msg.value;
          }
-         //adds amount to what buyer has paid.
-         buyerPaid[msg.sender] += msg.value;
-             if(pricing[ItemID] <= buyerPaid[msg.sender]){
+        
+            if(pricing[ItemID] <= buyerPaid[msg.sender]){
                  finalizeSale(ItemID, msg.sender);
              } else {
                  //"BUYER_PAID" "TOTAL_PRICE" 
@@ -207,7 +213,7 @@ contract PublicEscrow is ReentrancyGuard {
 
     function depositForSelf(uint256 ItemID, address PayingOnBehalfOf) external payable nonReentrant {
         require(buyerItemIdOfIntrest[ItemID] == PayingOnBehalfOf, "NO_SWIPING");
-        require(isPendingSale[ItemID] == true "ITEM_SOLD");
+        require(isPendingSale[ItemID] == true, "ITEM_SOLD");
         buyerPaid[PayingOnBehalfOf] += msg.value;
              if(pricing[ItemID] <= buyerPaid[PayingOnBehalfOf]){
                  finalizeSale(ItemID, PayingOnBehalfOf);
@@ -219,7 +225,7 @@ contract PublicEscrow is ReentrancyGuard {
              }
     }
 
-    }
+
 
     /*
     @Dev: Function to pay out seller and emit event when sale is done.
